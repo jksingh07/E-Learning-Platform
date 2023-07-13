@@ -1,7 +1,7 @@
 import datetime
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from .models import Student, Course, Announcement, Assignment, Submission, Material, Faculty, Department
+from .models import Student, Course, Announcement, Assignment, Submission, Material, Faculty, Department, Payment
 from django.template.defaulttags import register
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -733,3 +733,14 @@ def guestFaculty(request):
         return redirect('facultyCourses')
     except:
         return redirect('std_login')
+
+
+def payment(request):
+    if request.method == 'POST':
+        amount = request.POST['amount']
+        description = request.POST['description']
+        payment = Payment.objects.create(amount=amount, description=description)
+        # Perform payment processing and redirect to success/failure page
+        return render(request, 'payment_success.html', {'payment': payment})
+    else:
+        return render(request, 'main/payment.html')

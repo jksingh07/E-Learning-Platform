@@ -3,6 +3,17 @@ from froala_editor.fields import FroalaField
 
 # Create your models here.
 
+class CourseQuerySet(models.QuerySet):
+    def filter_by_membership(self, membership):
+        return self.filter(membership_level=membership)
+
+class CourseManager(models.Manager):
+    def get_queryset(self):
+        return CourseQuerySet(self.model, using=self._db)
+
+    def filter_by_membership(self, membership):
+        return self.get_queryset().filter_by_membership(membership)
+
 
 class Student(models.Model):
     student_id = models.IntegerField(primary_key=True)
@@ -24,7 +35,7 @@ class Student(models.Model):
     # student = Student.objects.get(student_id=1)
     # membership_c = student.membership
     # course = models.ManyToManyField('Course', related_name='students', blank=True,
-    #                                 limit_choices_to={'membership_level': models.F('membership')})
+    #                                 limit_choices_to={'membership_level': 'g'})
     photo = models.ImageField(upload_to='profile_pics', blank=True,
                               null=False, default='profile_pics/default_student.png')
     department = models.ForeignKey(
@@ -35,8 +46,15 @@ class Student(models.Model):
             self.photo.delete()
         super().delete(*args, **kwargs)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.course.set(Course.objects.filter_by_membership(self.membership))
+        # course = models.ManyToManyField('Course', related_name='students', blank=True,
+        #                                 limit_choices_to={'membership_level': self.membership})
+
     class Meta:
         verbose_name_plural = 'Students'
+
 
     def __str__(self):
         return self.name
@@ -90,6 +108,7 @@ class Department(models.Model):
 class Course(models.Model):
     code = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, unique=True)
+    price = models.IntegerField(default=100)
     MEMBERSHIP_CHOICES = (
         ('b', 'Bronze'),
         ('s', 'Silver'),
@@ -104,12 +123,31 @@ class Course(models.Model):
     studentKey = models.IntegerField(null=False, unique=True)
     facultyKey = models.IntegerField(null=False, unique=True)
 
+    payment_status = models.BooleanField(default=False)
+    payment_timestamp = models.DateTimeField(null=True)
+
+    objects = CourseManager()
+
     class Meta:
         unique_together = ('code', 'department', 'name')
         verbose_name_plural = "Courses"
 
     def __str__(self):
         return self.name
+
+class Payment(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.CharField(max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Payment - {self.id}"
+
+    def save(self, *args, **kwargs):
+        self.amount = self.course.price
+        super(Payment, self).save(*args, **kwargs)
+
 
 
 class Announcement(models.Model):
@@ -224,3 +262,4 @@ class Material(models.Model):
 
     def post_date(self):
         return self.datetime.strftime("%d-%b-%y, %I:%M %p")
+

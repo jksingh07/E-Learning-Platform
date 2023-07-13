@@ -43,6 +43,11 @@
                         data-bs-placement="bottom" title="Show all courses">Courses</a>
                   </li>
                   <li class="nav-item">
+                     <a class="nav-link active fw-bold" href="{% block membership %}{% endblock %}" data-bs-toggle="tooltip"
+                        data-bs-placement="bottom" title="Subscription">Membership</a>
+                  </li>
+
+                  <li class="nav-item">
                      <a class="nav-link active fw-bold" href="{% url 'std_logout' %}" data-bs-toggle="tooltip"
                         data-bs-placement="bottom" title="Log out">Log out</a>
                   </li>
