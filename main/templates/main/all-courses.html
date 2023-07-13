@@ -49,12 +49,12 @@
                {% if course not in enrolled%}
                <div class="container">
                   <div class="row">
-                    <div class="col">
-                      <a href="{% url 'access' course.code %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>
-                    </div>
-                    <div class="col">
+{#                    <div class="col">#}
+{#                      <a href="{% url 'access' course.code %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>#}
+{#                    </div>#}
+{#                    <div class="col">#}
                       <a href="{% url 'payment' course.code %}" class="btn btn-outline-dark"><span class="px-2">Buy Now</span></a>
-                    </div>
+{#                    </div>#}
                   </div>
                 </div>
 
