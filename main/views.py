@@ -766,3 +766,27 @@ def payment(request, course_code):
 
     return render(request, 'main/payment.html')
 
+
+def membership(request):
+    memberships = [
+        {
+            'name': 'Bronze',
+            'price': '$10/month',
+            'features': ['Feature 1', 'Feature 2', 'Feature 3'],
+            'button_class': 'btn-primary',
+        },
+        {
+            'name': 'Silver',
+            'price': '$20/month',
+            'features': ['Feature 1', 'Feature 2', 'Feature 3', 'Premium Support'],
+            'button_class': 'btn-info',
+        },
+        {
+            'name': 'Gold',
+            'price': '$30/month',
+            'features': ['Feature 1', 'Feature 2', 'Feature 3', 'Premium Support', 'Exclusive Content'],
+            'button_class': 'btn-warning',
+        },
+    ]
+
+    return render(request, 'main/membership.html', {'memberships': memberships})

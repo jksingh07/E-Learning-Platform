@@ -50,4 +50,5 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('error/', views.error, name='error'),
     path('payment/<int:course_code>/', views.payment, name='payment'),
+    path('membership/', views.membership, name='membership'),
 ]
