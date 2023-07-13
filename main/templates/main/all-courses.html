@@ -53,7 +53,7 @@
                       <a href="{% url 'access' course.code %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>
                     </div>
                     <div class="col">
-                      <a href="{% url 'payment' %}" class="btn btn-outline-dark"><span class="px-2">Buy Now</span></a>
+                      <a href="{% url 'payment' course.code %}" class="btn btn-outline-dark"><span class="px-2">Buy Now</span></a>
                     </div>
                   </div>
                 </div>

@@ -109,6 +109,7 @@ class Course(models.Model):
     code = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=255, null=False, unique=True)
     price = models.IntegerField(default=100)
+    description = models.CharField(max_length=200, default='Course Description')
     MEMBERSHIP_CHOICES = (
         ('b', 'Bronze'),
         ('s', 'Silver'),
@@ -123,8 +124,8 @@ class Course(models.Model):
     studentKey = models.IntegerField(null=False, unique=True)
     facultyKey = models.IntegerField(null=False, unique=True)
 
-    payment_status = models.BooleanField(default=False)
-    payment_timestamp = models.DateTimeField(null=True)
+    # payment_status = models.BooleanField(default=False)
+    # payment_timestamp = models.DateTimeField(null=True)
 
     objects = CourseManager()
 

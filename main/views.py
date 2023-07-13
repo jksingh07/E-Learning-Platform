@@ -8,8 +8,8 @@ from django.http import HttpResponseRedirect
 from .forms import AnnouncementForm, AssignmentForm, MaterialForm
 from django import forms
 from django.core import validators
-
-
+from django.conf import settings
+import stripe
 from django import forms
 
 
@@ -735,12 +735,34 @@ def guestFaculty(request):
         return redirect('std_login')
 
 
-def payment(request):
-    if request.method == 'POST':
-        amount = request.POST['amount']
-        description = request.POST['description']
-        payment = Payment.objects.create(amount=amount, description=description)
-        # Perform payment processing and redirect to success/failure page
-        return render(request, 'payment_success.html', {'payment': payment})
-    else:
-        return render(request, 'main/payment.html')
+def payment(request, course_code):
+    print(course_code)
+    if request.method in ['GET','POST']:
+        # course_code = request.POST['code']
+        course = Course.objects.get(code=course_code)
+        amount = course.price
+        description = course.description
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe_pk = settings.STRIPE_PUBLIC_KEY
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency='usd',
+            )
+            payment = Payment.objects.create(course=course, amount=amount, description=description)
+            payment.save()
+            payment_success = True  # Set payment_success to True if payment is successful
+        except stripe.error.CardError as e:
+            error_message = e.error.message
+            return render(request, 'main/payment_error.html', {'error_message': error_message})
+
+        return render(request, 'main/payment.html', {
+            'stripe_public_key': stripe_pk,
+            'client_secret': intent.client_secret,
+            'course': course,
+            'payment_success': payment_success,
+        })
+
+    return render(request, 'main/payment.html')
+

@@ -1,26 +1,88 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Payment Gateway</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-    <div class="container">
-        <h1 class="mt-5">Payment Gateway</h1>
-        <form method="POST" action="{% url 'payment' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="amount">Amount:</label>
-                <input type="text" class="form-control" name="amount" id="amount">
+{% extends 'index.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-white">
+                    Payment Details
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'payment' course.code %}" id="payment-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="course">Course:</label>
+                            <input type="text" class="form-control" id="course" value="{{ course.name }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
+                            <input type="text" class="form-control" id="amount" name="amount" value="{{ course.price }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <input type="text" class="form-control" id="description" name="description" value="{{ course.description }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-element">Card Details:</label>
+                            <div id="card-element" class="form-control"></div>
+                        </div>
+                        <button id="pay-button" type="submit" class="btn btn-primary">Pay Now</button>
+                    </form>
+                    <div id="payment-success" class="alert alert-success mt-4" style="display: none;">
+                        Payment successful!
+                        <div class="col">
+                            <a href="{% url 'access' course.code %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <input type="text" class="form-control" name="description" id="description">
-            </div>
-            <button type="submit" class="btn btn-primary">Pay Now</button>
-        </form>
+        </div>
     </div>
+</div>
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('pk_test_51NTV2PL2VuWDvZdwEHpiXFWigyv751RPS1NV3AuQdb3MYxgBTZkmvNPj9Roa6y7PuO8xC5XY7Uh3L206ZmJvZibJ009Tlwwaij');
+    var elements = stripe.elements();
+    var style = {
+        base: {
+            color: '#32325d',
+            fontFamily: 'Arial, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a'
+        }
+    };
+    var card = elements.create('card', { style: style });
+    card.mount('#card-element');
+    var form = document.getElementById('payment-form');
+    var paymentSuccessMessage = document.getElementById('payment-success');
+
+    form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    stripe.createPaymentMethod('card', card).then(function(result) {
+        if (result.error) {
+            console.log(result.error.message);
+        } else {
+            stripe.handleCardPayment('{{ client_secret }}', {
+                payment_method: result.paymentMethod.id
+            }).then(function(paymentResult) {
+                if (paymentResult.error) {
+                    console.log(paymentResult.error.message);
+                } else {
+                    paymentSuccessMessage.style.display = 'block';
+                    {#form.submit();#}
+                }
+            });
+        }
+    });
+});
+
+</script>
+{% endblock %}
