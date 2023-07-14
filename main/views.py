@@ -11,7 +11,8 @@ from django.core import validators
 from django.conf import settings
 import stripe
 from django import forms
-
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 class LoginForm(forms.Form):
     id = forms.CharField(label='ID', max_length=10, validators=[
@@ -757,6 +758,13 @@ def payment(request, course_code):
             error_message = e.error.message
             return render(request, 'main/payment_error.html', {'error_message': error_message})
 
+        access_code = course.studentKey
+        # Send an email to the student with the access code
+        subject = 'Access Code for Course'
+        message = render_to_string('main/access_code_email.html', {'access_code': access_code})
+        student_email = 'jksingh.js7@gmail.com'
+        # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student_email])
+        # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [course.student.email])
         return render(request, 'main/payment.html', {
             'stripe_public_key': stripe_pk,
             'client_secret': intent.client_secret,

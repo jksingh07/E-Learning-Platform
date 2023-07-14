@@ -83,6 +83,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'eLMS.wsgi.application'
 
+# Email Backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# SMTP Server Settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587  # Use the appropriate port for your SMTP server
+EMAIL_HOST_USER = 'jazzy199907@gmail.com'  # Your email address
+EMAIL_HOST_PASSWORD = ''  # Your email password
+EMAIL_USE_TLS = True  # Use TLS encryption for secure connection
+
+# Default Email From Address
+DEFAULT_FROM_EMAIL = 'jazzy199907@gmail.com'
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
