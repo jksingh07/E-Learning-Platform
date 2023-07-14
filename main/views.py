@@ -13,7 +13,7 @@ import stripe
 from django import forms
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-
+from django.core.mail import EmailMessage
 class LoginForm(forms.Form):
     id = forms.CharField(label='ID', max_length=10, validators=[
                          validators.RegexValidator(r'^\d+$', 'Please enter a valid number.')])
@@ -759,12 +759,37 @@ def payment(request, course_code):
             return render(request, 'main/payment_error.html', {'error_message': error_message})
 
         access_code = course.studentKey
-        # Send an email to the student with the access code
+
+        access_code = course.studentKey
         subject = 'Access Code for Course'
-        message = render_to_string('main/access_code_email.html', {'access_code': access_code})
+        template_name = 'main/access_code_email.html'
+
+        # Render the email content using the template
+        email_content = render_to_string(template_name, {'access_code': access_code})
         student_email = 'jksingh.js7@gmail.com'
-        # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student_email])
-        # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [course.student.email])
+        # Create an EmailMessage object
+        email = EmailMessage(
+            subject=subject,
+            body=email_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[student_email],# Replace with the actual recipient's email address
+            connection=None
+        )
+
+        # # Configure the email backend with Elastic Email SMTP settings
+        # email.connection = {
+        #     'host': 'smtp.elasticemail.com',
+        #     'port': 2525,
+        #     'username': settings.EMAIL_HOST_USER,
+        #     'password': settings.EMAIL_HOST_PASSWORD,
+        #     'use_tls': True,
+        #     'fail_silently': False,
+        # }
+
+        # Send the email
+        # email.send()
+
+
         return render(request, 'main/payment.html', {
             'stripe_public_key': stripe_pk,
             'client_secret': intent.client_secret,
