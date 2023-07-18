@@ -1,6 +1,6 @@
 from django import forms
 from froala_editor.widgets import FroalaEditor
-from .models import Announcement, Assignment, Material
+from .models import Announcement, Assignment, Material, Department
 
 
 class AnnouncementForm(forms.ModelForm):
@@ -52,3 +52,13 @@ class MaterialForm(forms.ModelForm):
             'description': FroalaEditor(),
             'file': forms.FileInput(attrs={'class': 'form-control', 'id': 'file', 'name': 'file', 'aria-describedby': 'file', 'aria-label': 'Upload'}),
         }
+
+
+class SignupForm(forms.Form):
+    user_id = forms.IntegerField(required=True)
+    name = forms.CharField(max_length=100, label='Full Name')
+    email = forms.EmailField(max_length=100, label='Email', required=False)
+    password = forms.CharField(widget=forms.PasswordInput(), max_length=128, label='Password')
+    user_type = forms.ChoiceField(choices=(('ST', 'Student'), ('FA', 'Faculty')))
+    membership = forms.ChoiceField(choices=(('b', 'Bronze'),), initial='b', required=False)
+    department = forms.ModelChoiceField(queryset=Department.objects.all(), empty_label=None)

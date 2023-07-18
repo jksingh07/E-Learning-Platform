@@ -41,7 +41,7 @@ class Student(models.Model):
         ('g', 'Gold'),
     )
 
-    membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, blank=True)
+    membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, blank=True, default='b')
     #print('membership',membership)
     role = models.CharField(
         default="Student", max_length=100, null=False, blank=True)

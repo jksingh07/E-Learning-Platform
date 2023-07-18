@@ -11,6 +11,7 @@ from django.core import validators
 from django.conf import settings
 import stripe
 from django import forms
+from .forms import SignupForm
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
@@ -891,3 +892,46 @@ def access_courses(request, code):
 
     return redirect('courses')
 
+def signup(request):
+    if request.method == 'POST':
+        print("I AM IN POST")
+        form = SignupForm(request.POST)
+
+        if form.is_valid():
+            print("Form is Valid")
+            user_type = request.POST.get('user_type')
+            print(user_type)
+            if user_type == 'ST':  # Student
+                student = Student(
+                    student_id=form.cleaned_data['user_id'],
+                    name=form.cleaned_data['name'],
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'],
+                    membership=form.cleaned_data['membership'],
+                    role="Student",
+                    department=form.cleaned_data['department']
+                )
+                print(student)
+                student.save()
+            elif user_type == 'FA':  # Faculty
+                faculty = Faculty(
+                    faculty_id=form.cleaned_data['user_id'],
+                    name=form.cleaned_data['name'],
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password'],
+                    role="Faculty",
+                    department=form.cleaned_data['department']
+                )
+                print(faculty)
+                faculty.save()
+
+            # Redirect to the login page after successful signup
+            return redirect('std_login')
+        else:
+            print("NOT VALID")
+            print(form.errors)
+    else:
+        print("GET")
+        form = SignupForm()
+
+    return render(request, 'signup.html', {'form': form})

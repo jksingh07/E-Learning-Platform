@@ -5,7 +5,7 @@
       <meta charset="UTF-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Log in | eLMS</title>
+      <title>Sign Up | eLMS</title>
       <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/icon/apple-touch-icon.png' %}">
       <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/icon/favicon-32x32.png' %}">
       <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/icon/favicon-16x16.png' %}">
@@ -21,22 +21,69 @@
             <div class="container">
                <div class="signin-content">
                   <div class="signin-image">
-                     <figure><img src="{% static 'images/login-bg.jpg' %}" alt="sing up image"></figure>
+                     <figure><img src="{% static 'images/login-bg.jpg' %}" alt="sign up image"></figure>
                   </div>
                   <div class="signin-form">
-                     <h2 class="form-title">Sign in to eLMS</h2>
-                     <form method="POST" class="register-form" id="login-form">
+                     <h2 class="form-title">Sign Up to eLMS</h2>
+                     <form method="POST" class="register-form" action="{% url 'signup' %}">
                            {% csrf_token %}
+                            <div class="form-group">
+                              <label for="{{ form.user_id.id_for_label }}"><span class="material-symbols-outlined" style="vertical-align:text-bottom">numbers</span></label>
+                              {{ form.user_id }}
+                           </div>
                            <div class="form-group">
-                              <label for="{{ form.id.id_for_label }}"><span class="material-symbols-outlined" style="vertical-align:text-bottom">numbers</span></label>
-                              {{ form.id }}
+                              <label for="{{ form.name.id_for_label }}"><span class="material-symbols-outlined" style="vertical-align:text-bottom">person</span></label>
+                              {{ form.name }}
+                           </div>
+                           <div class="form-group">
+                              <label for="{{ form.email.id_for_label }}"><span class="material-symbols-outlined" style="vertical-align:text-bottom">email</span></label>
+                              {{ form.email }}
                            </div>
                            <div class="form-group">
                               <label for="{{ form.password.id_for_label }}"><span class="material-symbols-outlined" style="vertical-align:text-bottom">lock</span></label>
                               {{ form.password }}
                            </div>
+                           <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td style="padding-right: 100px;">
+                                            <label for="{{ form.user_type.id_for_label }}">Account Type</label>
+                                        </td>
+                                        <td>
+                                                {{ form.user_type }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td style="padding-right: 100px;">
+                                            <label for="{{ form.department.id_for_label }}">Department</label>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                {{ form.department }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <table>
+                                    <tr>
+                                        <td style="padding-right: 100px;">
+                                            <label for="{{ form.membership.id_for_label }}">Membership</label>
+                                        </td>
+                                        <td>
+                                                {{ form.membership }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
                            <div class="d-grid">
-                              <button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">Sign in</button>
+                              <button class="btn btn-lg btn-primary btn-login text-uppercase fw-bold mb-2" type="submit">Sign Up</button>
                            </div>
                      </form>
                      <div class="d-flex justify-content-around flex-wrap">
@@ -55,8 +102,8 @@
                         <div class="ms-3">
                            <a href="/admin" target="_blank">Sign in as Admin</a>
                         </div>
-                         <div class="ms-3">
-                           <a href="/signup">Sign Up</a>
+                        <div class="ms-3">
+                           <a href="/login">Sign In</a>
                         </div>
                      </div>
                      {% if error_messages %}
@@ -73,11 +120,11 @@
             </div>
          </section>
       </div>
-      <script src=" {% static 'js/bootstrap.bundle.min.js' %} "></script>
+      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
       <script>
          if (window.history.replaceState) {
              window.history.replaceState(null, null, window.location.href);
-         }     
+         }
       </script>
    </body>
 </html>
