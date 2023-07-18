@@ -756,7 +756,7 @@ def payment(request, course_code):
         stripe_pk = settings.STRIPE_PUBLIC_KEY
         try:
             intent = stripe.PaymentIntent.create(
-                amount=amount,
+                amount=int(amount*100),
                 currency='usd',
             )
             payment = Payment.objects.create(course=course, amount=amount, description=description)

@@ -16,9 +16,10 @@
                     <strong>{{ membership.features }}</strong>
                 </div>
 
-
                 <div class="card-footer {% if membership.name == 'Gold' %}bg-warning{% elif membership.name == 'Silver' %}bg-secondary{% elif membership.name == 'Bronze' %}bg-dark{% endif %} text-white"">
-                    <a href="{% url 'membership_payment' membership.pk %}" class="btn btn-primary">Select</a>
+                    <div class="text-center">
+                        <a href="{% url 'membership_payment' membership.pk %}" class="btn btn-primary">Select</a>
+                    </div>
                 </div>
             </div>
         </div>

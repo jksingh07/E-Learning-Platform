@@ -30,8 +30,8 @@
                         <button id="pay-button" type="submit" class="btn btn-primary">Pay Now</button>
                     </form>
                     <div id="payment-success" class="alert alert-success mt-4" style="display: none;">
-                        <strong>Payment successful!</strong>
-                        <strong>Congratulations!!! <br>Now you are a {{ selected_membership.name }} member</strong>
+                        <strong>Payment successful!</strong><br>
+                        <p>Congratulations {{ student.name }}!!! <br>Now you are a {{ selected_membership.name }} member</p>
                         <div class="col">
                             <a href="{% url 'access_courses' selected_membership.id %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>
                         </div>
