@@ -14,7 +14,22 @@ class CourseManager(models.Manager):
     def filter_by_membership(self, membership):
         return self.get_queryset().filter_by_membership(membership)
 
+class User(models.Model):
+    STUDENT = 'ST'
+    FACULTY = 'FA'
+    USER_TYPES = [
+        (STUDENT, 'Student'),
+        (FACULTY, 'Faculty'),
+    ]
 
+    username = models.CharField(max_length=50, unique=True)
+    password = models.CharField(max_length=128)
+    email = models.EmailField(unique=True)
+    full_name = models.CharField(max_length=100)
+    user_type = models.CharField(max_length=2, choices=USER_TYPES)
+
+    def __str__(self):
+        return self.username
 class Student(models.Model):
     student_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100, null=False)
@@ -269,7 +284,7 @@ class Membership(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=10)
     features = models.TextField()
-    button_class = models.CharField(max_length=20)
+    # button_class = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
