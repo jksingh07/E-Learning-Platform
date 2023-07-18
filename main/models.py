@@ -264,3 +264,12 @@ class Material(models.Model):
     def post_date(self):
         return self.datetime.strftime("%d-%b-%y, %I:%M %p")
 
+
+class Membership(models.Model):
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=10)
+    features = models.TextField()
+    button_class = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name

@@ -1,7 +1,7 @@
 import datetime
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from .models import Student, Course, Announcement, Assignment, Submission, Material, Faculty, Department, Payment
+from .models import Student, Course, Announcement, Assignment, Submission, Material, Faculty, Department, Payment, Membership
 from django.template.defaulttags import register
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -501,9 +501,17 @@ def courses(request):
     if request.session.get('student_id') or request.session.get('faculty_id'):
 
         courses = Course.objects.all()
+        # courses = Course.objects.filter(membership_level='g')
         if request.session.get('student_id'):
             student = Student.objects.get(
                 student_id=request.session['student_id'])
+            if student.membership == 'g':
+                courses = Course.objects.all()
+            elif student.membership == 's':
+                courses = Course.objects.filter(membership_level__in = ['b', 's'])
+            else:
+                courses = Course.objects.filter(membership_level='b')
+            # courses = Course.objects.filter(membership_level=student.membership)
         else:
             student = None
         if request.session.get('faculty_id'):
@@ -800,26 +808,86 @@ def payment(request, course_code):
     return render(request, 'main/payment.html')
 
 
-def membership(request):
-    memberships = [
-        {
-            'name': 'Bronze',
-            'price': '$10/month',
-            'features': ['Feature 1', 'Feature 2', 'Feature 3'],
-            'button_class': 'btn-primary',
-        },
-        {
-            'name': 'Silver',
-            'price': '$20/month',
-            'features': ['Feature 1', 'Feature 2', 'Feature 3', 'Premium Support'],
-            'button_class': 'btn-info',
-        },
-        {
-            'name': 'Gold',
-            'price': '$30/month',
-            'features': ['Feature 1', 'Feature 2', 'Feature 3', 'Premium Support', 'Exclusive Content'],
-            'button_class': 'btn-warning',
-        },
-    ]
 
-    return render(request, 'main/membership.html', {'memberships': memberships})
+def membership(request):
+    # Fetch membership details from the Membership model
+    memberships = Membership.objects.all()
+    return render(request, 'main/membership_new.html', {'memberships': memberships})
+
+def membership_payment(request, selected_membership_pk):
+    selected_membership = Membership.objects.get(pk=selected_membership_pk)
+    std_id = request.session.get('student_id')
+    student = Student.objects.get(student_id=std_id)
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    # Initialize payment_success to False
+    payment_success = False
+
+    if request.method == 'GET':
+        # Create a PaymentIntent and get the client_secret for the payment form
+        intent = stripe.PaymentIntent.create(
+            amount=int(selected_membership.price * 100),  # Amount in cents
+            currency='usd',
+        )
+        client_secret = intent.client_secret
+
+    # elif request.method == 'POST':
+    #     # Get the payment details from the form
+    #     stripe.api_key = settings.STRIPE_SECRET_KEY
+    #
+    #     # Assume you have received the payment details from the form
+    #     # and have the necessary payment processing code here.
+    #     # For example, if you have received a successful payment, set payment_success to True
+    #
+    #     # Sample code for payment processing using Stripe
+    #     try:
+    #         # Replace the following line with your actual payment processing code
+    #         # For example, if payment is successful, set payment_success to True
+    #         # payment_success = True
+    #
+    #         # Since this is just a sample, we'll simulate a successful payment here
+    #         payment_success = True
+    #
+    #     except stripe.error.CardError as e:
+    #         error_message = e.error.message
+    #         return render(request, 'main/payment_error.html', {'error_message': error_message})
+    #     except Exception as e:
+    #         error_message = str(e)
+    #         return render(request, 'main/payment_error.html', {'error_message': error_message})
+    #
+    #     if payment_success:
+    #         # Update the student's membership
+    #         if selected_membership.name == 'Gold':
+    #             student.membership = 'g'
+    #         elif selected_membership.name == 'Silver':
+    #             student.membership = 's'
+    #         else:
+    #             student.membership = 'b'
+    #         student.save()
+    #
+    #         # Redirect to a success page after successful payment
+    #         return redirect('membership_payment_success')
+
+    context = {
+        'selected_membership': selected_membership,
+        'student': student,
+        'client_secret': client_secret if request.method == 'GET' else '',  # Pass the client_secret to the template
+        'payment_success': payment_success,  # Pass the payment_success flag to the template
+    }
+    return render(request, 'main/membership_payment.html', context)
+
+def access_courses(request, code):
+    selected_membership = Membership.objects.get(pk=code)
+    std_id = request.session.get('student_id')
+    student = Student.objects.get(student_id=std_id)
+
+    if selected_membership.name == 'Gold':
+        student.membership = 'g'
+    elif selected_membership.name == 'Silver':
+        student.membership = 's'
+    else:
+        student.membership = 'b'
+    student.save()
+
+    return redirect('courses')
+

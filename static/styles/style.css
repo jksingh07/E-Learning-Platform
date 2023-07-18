@@ -153,3 +153,8 @@ th {
   );
   color: #482307;
 }
+
+/* Custom silver color */
+.bg-silver {
+    background-color: #D3D3D3; /* Light grey color */
+}
