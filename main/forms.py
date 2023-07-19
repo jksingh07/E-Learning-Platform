@@ -1,6 +1,6 @@
 from django import forms
 from froala_editor.widgets import FroalaEditor
-from .models import Announcement, Assignment, Material, Department
+from .models import Announcement, Assignment, Material, Department, Course
 
 
 class AnnouncementForm(forms.ModelForm):
@@ -62,3 +62,18 @@ class SignupForm(forms.Form):
     user_type = forms.ChoiceField(choices=(('ST', 'Student'), ('FA', 'Faculty')))
     membership = forms.ChoiceField(choices=(('b', 'Bronze'),), initial='b', required=False)
     department = forms.ModelChoiceField(queryset=Department.objects.all(), empty_label=None)
+
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = [
+            'code',
+            'name',
+            'faculty',
+            'price',
+            'description',
+            'membership_level',
+            'department',
+            'studentKey',
+            'facultyKey',
+        ]

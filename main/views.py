@@ -11,7 +11,7 @@ from django.core import validators
 from django.conf import settings
 import stripe
 from django import forms
-from .forms import SignupForm
+from .forms import SignupForm, CourseForm
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
@@ -935,3 +935,20 @@ def signup(request):
         form = SignupForm()
 
     return render(request, 'signup.html', {'form': form})
+
+
+def add_course(request):
+    f_id = request.session.get('faculty_id')
+    faculty = Faculty.objects.get(faculty_id=f_id)
+    if request.method == 'POST':
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            # Save the new course
+            course = form.save(commit=False)
+            # Assuming you have the faculty object available in the current session
+            # course.faculty = request.session.get('faculty', None)
+            course.save()
+            return redirect('courses')
+    else:
+        form = CourseForm()
+    return render(request, 'main/add_course.html', {'form': form, 'faculty': faculty})
