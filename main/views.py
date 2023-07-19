@@ -23,6 +23,9 @@ from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import reverse
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.http import urlsafe_base64_decode
+
 # from django.utils.encoding import force_bytes
 
 class MyTokenGenerator(PasswordResetTokenGenerator):
@@ -1012,12 +1015,13 @@ def forgot_password(request):
             email = form.cleaned_data['email']
             try:
                 user = Student.objects.get(email=email)
+                # print(user.name)
                 current_site = get_current_site(request)
                 subject = 'Password Reset Request'
                 protocol = settings.SITE_PROTOCOL
-                path = reverse('password_reset_confirm', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
-                                                                 'token': my_token_generator.make_token(user)})
-                reset_link = f'{protocol}://{current_site.domain}{path}'
+                # path = reverse('password_reset_confirm', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                #                                                  'token': my_token_generator.make_token(user)})
+                # reset_link = f'{protocol}://{current_site.domain}{path}'
                 message = render_to_string('main/password_reset_email.html', {
                     'user': user,
                     'domain': current_site.domain,
@@ -1032,3 +1036,54 @@ def forgot_password(request):
             except Student.DoesNotExist:
                 messages.error(request, 'User with this email address does not exist.')
     return render(request, 'main/forgot_password.html', {'form': form})
+
+def password_reset_confirm(request, uidb64, token):
+    print("I am here")
+    form = SetPasswordForm(user=None)  # Initialize the form without a user
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = Student.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Student.DoesNotExist):
+        user = None
+
+    if user is not None and my_token_generator.check_token(user, token):
+        if request.method == 'POST':
+            print("POST request")
+
+            if user.password == request.POST['oldPassword']:
+                print("password match")
+                # New and confirm password check is done in the client side
+                user.password = request.POST['newPassword']
+                user.save()
+                messages.success(request, 'Password was changed successfully')
+                return redirect('/profile/' + str(user.student_id))
+            else:
+                messages.error(
+                    request, 'Password is incorrect. Please try again')
+                return redirect('/changePassword/')
+        else:
+            return render(request, 'main/password_reset_confirm.html', {'user': user})
+
+    return render(request, 'main/password_reset_confirm.html', {'form': form, 'user': user, 'token': token})
+
+def password_reset_view(request):
+    if request.method == 'POST':
+        print("POST request")
+        user = Student.objects.get(pk=request.POST['student_id'])
+        if user.password == request.POST['oldPassword']:
+            print("password match")
+            # New and confirm password check is done in the client side
+            user.password = request.POST['newPassword']
+            user.save()
+            messages.success(request, 'Password was changed successfully')
+            return redirect('std_login')
+        else:
+            messages.error(
+                request, 'Password is incorrect. Please try again')
+            return redirect('/changePassword/')
+    else:
+        return redirect('std_login')
+
+    #
+    # else:
+    #     return redirect('std_login')
