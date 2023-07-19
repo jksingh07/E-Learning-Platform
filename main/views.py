@@ -747,6 +747,16 @@ def guestFaculty(request):
 
 def payment(request, course_code):
     print(course_code)
+    if request.session.get('student_id'):
+        student = Student.objects.get(
+            student_id=request.session['student_id'])
+    else:
+        student = None
+    if request.session.get('faculty_id'):
+        faculty = Faculty.objects.get(
+            faculty_id=request.session['faculty_id'])
+    else:
+        faculty = None
     if request.method in ['GET','POST']:
         # course_code = request.POST['code']
         course = Course.objects.get(code=course_code)
@@ -804,6 +814,8 @@ def payment(request, course_code):
             'client_secret': intent.client_secret,
             'course': course,
             'payment_success': payment_success,
+            'student': student,
+            'faculty': faculty,
         })
 
     return render(request, 'main/payment.html')
