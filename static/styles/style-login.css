@@ -260,6 +260,7 @@ label {
 }
 
 .signin-form {
+  width: 100%; /* Adjust the width as needed */
   margin-right: 90px;
   margin-left: 80px;
 }
