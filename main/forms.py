@@ -77,3 +77,6 @@ class CourseForm(forms.ModelForm):
             'studentKey',
             'facultyKey',
         ]
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField(label='Email', max_length=100)

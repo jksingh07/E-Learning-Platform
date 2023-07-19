@@ -11,10 +11,25 @@ from django.core import validators
 from django.conf import settings
 import stripe
 from django import forms
-from .forms import SignupForm, CourseForm
+from .forms import SignupForm, CourseForm, ForgotPasswordForm
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.urls import reverse
+# from django.utils.encoding import force_bytes
+
+class MyTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return f"{user.pk}{timestamp}"
+
+my_token_generator = MyTokenGenerator()
 class LoginForm(forms.Form):
     id = forms.CharField(label='ID', max_length=10, validators=[
                          validators.RegexValidator(r'^\d+$', 'Please enter a valid number.')])
@@ -989,3 +1004,31 @@ def add_course(request):
     else:
         form = CourseForm()
     return render(request, 'main/add_course.html', {'form': form, 'faculty': faculty})
+
+def forgot_password(request):
+    form = ForgotPasswordForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = Student.objects.get(email=email)
+                current_site = get_current_site(request)
+                subject = 'Password Reset Request'
+                protocol = settings.SITE_PROTOCOL
+                path = reverse('password_reset_confirm', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(user.pk)),
+                                                                 'token': my_token_generator.make_token(user)})
+                reset_link = f'{protocol}://{current_site.domain}{path}'
+                message = render_to_string('main/password_reset_email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': my_token_generator.make_token(user),
+                    'protocol': protocol,
+                    # 'token': default_token_generator.make_token(user),
+                })
+                send_mail(subject, message, 'jazzy199907@gmail.com', [email])
+                messages.success(request, 'Password reset email has been sent. Please check your email.')
+                return redirect('std_login')
+            except Student.DoesNotExist:
+                messages.error(request, 'User with this email address does not exist.')
+    return render(request, 'main/forgot_password.html', {'form': form})
