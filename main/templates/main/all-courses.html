@@ -27,11 +27,14 @@
    </nav>
 </div>
    <!-- navigation links end -->
-    <!-- Add Course button -->
+    {% if faculty %}
+   <!-- Add Course button (only shown for faculty) -->
    <div class="container mt-4">
       <a href="{% url 'add_course' %}" class="btn btn-primary">Add Course</a>
    </div>
    <!-- End Add Course button -->
+   {% endif %}
+
    <div class="row gy-5">
       {% if courses %}
       {% for course in courses%}
@@ -52,16 +55,16 @@
                {% if not faculty %}
                {% comment %} if student {% endcomment %}
                {% if course not in enrolled%}
-               <div class="container">
-                  <div class="row">
+{#               <div class="container">#}
+{#                  <div class="row">#}
 {#                    <div class="col">#}
 {#                      <a href="{% url 'access' course.code %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>#}
 {#                    </div>#}
 {#                    <div class="col">#}
                       <a href="{% url 'payment' course.code %}" class="btn btn-outline-dark"><span class="px-2">Buy Now</span></a>
-                    </div>
-                  </div>
-                </div>
+{#                      </div>#}
+{#                  </div>#}
+{#                </div>#}
 
                {% else %}
                <a href="{% url 'course' course.code %}" class="btn btn-outline-dark"><span
