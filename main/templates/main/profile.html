@@ -47,7 +47,16 @@
       <div class="my-3">
          <h5>Name : {{student.name}}</h5>
          <h5>ID : <span class="mx-3 px-1"></span>{{student.student_id}}</h5>
-         <h5>Dept :<span class="mx-2"> {{student.department}}</h5>
+          <h5>Dept :<span class="mx-2"></span>{{student.department}}</h5>
+          <h5>Membership: <span class="mx-2">
+            {% if student.membership == 'b' %}
+            Bronze
+            {% elif student.membership == 's' %}
+            Silver
+            {% elif student.membership == 'g' %}
+            Gold
+            {% endif %}
+            </span></h5>
       </div>
    </div>
    <div class="d-flex justify-content-center">

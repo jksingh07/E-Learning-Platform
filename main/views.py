@@ -813,12 +813,36 @@ def payment(request, course_code):
 def membership(request):
     # Fetch membership details from the Membership model
     memberships = Membership.objects.all()
-    return render(request, 'main/membership_new.html', {'memberships': memberships})
+    if request.session.get('student_id'):
+        student = Student.objects.get(
+            student_id=request.session['student_id'])
+    else:
+        student = None
+    if request.session.get('faculty_id'):
+        faculty = Faculty.objects.get(
+            faculty_id=request.session['faculty_id'])
+    else:
+        faculty = None
+    context = {
+        'memberships': memberships,
+        'student': student,
+        'faculty': faculty,
+    }
+
+    return render(request, 'main/membership_new.html', context)
 
 def membership_payment(request, selected_membership_pk):
     selected_membership = Membership.objects.get(pk=selected_membership_pk)
-    std_id = request.session.get('student_id')
-    student = Student.objects.get(student_id=std_id)
+    if request.session.get('student_id'):
+        student = Student.objects.get(
+            student_id=request.session['student_id'])
+    else:
+        student = None
+    if request.session.get('faculty_id'):
+        faculty = Faculty.objects.get(
+            faculty_id=request.session['faculty_id'])
+    else:
+        faculty = None
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # Initialize payment_success to False
@@ -872,6 +896,7 @@ def membership_payment(request, selected_membership_pk):
     context = {
         'selected_membership': selected_membership,
         'student': student,
+        'faculty': faculty,
         'client_secret': client_secret if request.method == 'GET' else '',  # Pass the client_secret to the template
         'payment_success': payment_success,  # Pass the payment_success flag to the template
     }
