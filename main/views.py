@@ -1075,12 +1075,12 @@ def password_reset_view(request):
             # New and confirm password check is done in the client side
             user.password = request.POST['newPassword']
             user.save()
-            messages.success(request, 'Password was changed successfully')
-            return redirect('std_login')
+            # messages.success(request, 'Password was changed successfully')
+            return redirect('password_reset_complete')
         else:
             messages.error(
                 request, 'Password is incorrect. Please try again')
-            return redirect('/changePassword/')
+            return redirect('password_error')
     else:
         return redirect('std_login')
 
