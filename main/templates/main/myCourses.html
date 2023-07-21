@@ -38,7 +38,7 @@
                   <p class="card-text">{% if course.faculty %}Course Teacher: {{ course.faculty.name }}{% else %}Teacher not assigned yet{% endif %}</p>
                </div>
                <div class="card-footer bg-warning text-white">
-                  <a href="{% url 'course' course.code %}" class="btn btn-outline-light">Enter</a>
+                  <a href="{% url 'course' course.code %}" class="btn btn-outline-primary btn-light text-dark">Enter</a>
                </div>
             </div>
          {% elif course.membership_level == 's' %}
@@ -73,7 +73,7 @@
          <!-- individual course ends -->
          {% endfor %}
       </div>
-      <!-- Course container ends -->
+      <!-- Course container ends -->s
       {% else %}
       <div class="text-center fs-5 text-secondary">
          <p>You are not enrolled in any courses</p>

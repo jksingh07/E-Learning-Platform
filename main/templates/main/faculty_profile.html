@@ -1,62 +1,60 @@
 {% extends 'index.html' %}
-{% block title %} {{faculty.name}} | eLMS {% endblock title %}
+{% block title %}{{ faculty.name }} | eLMS{% endblock title %}
 {% block profile %}
-{% url 'profile' faculty.faculty_id %}
+    {% url 'profile' faculty.faculty_id %}
 {% endblock %}
 {% block user %}
-{{faculty.name}}
+    {{ faculty.name }}
 {% endblock user %}
 {% block courses %}
-{% url 'facultyCourses' %}
+    {% url 'facultyCourses' %}
 {% endblock courses %}
 {% block allCourses %}
-{% url 'courses' %}
+    {% url 'courses' %}
 {% endblock %}
 {% block content %}
 {% if messages %}
-{% for message in messages %}
 <div class="alert alert-info alert-dismissible fade show" role="alert">
+   {% for message in messages %}
    {{ message }}
+   {% endfor %}
    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-{% endfor %}
 {% endif %}
-<!-- navigation links -->
-<div class="container shadow-sm">
-   <nav style="--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);" aria-label="breadcrumb">
-      <ol class="breadcrumb p-3">
-         <li class="breadcrumb-item active" aria-current="page"> Profile </li>
-      </ol>
-   </nav>
-</div>
-<!-- navigation links end -->
-<div class="container shadow-sm rounded">
-   <div class="row">
-      <div class="col-12">
-         <div class="fs-5 my-3 text-secondary d-flex justify-content-center">
-            <p>Teacher info</p>
+<!-- Profile Info Card -->
+<div class="container mt-4">
+   <div class="card shadow">
+      <div class="card-body">
+         <div class="row">
+            <div class="col-md-8">
+               <h5 class="card-title fw-bold display-4">{{ faculty.name }}</h5>
+               <p class="card-text fs-5">ID: {{ faculty.faculty_id }}</p>
+               <p class="card-text fs-5">Department: {{ faculty.department }}</p>
+{#               <p class="card-text fs-5">Membership:#}
+{#                  <span class="badge {% if faculty.membership == 'g' %}bg-warning text-white{% elif faculty.membership == 's' %}bg-secondary text-white{% elif faculty.membership == 'b' %}bg-dark text-white{% endif %}">#}
+{#                  {% if faculty.membership == 'g' %}#}
+{#                     Gold#}
+{#                  {% elif faculty.membership == 's' %}#}
+{#                     Silver#}
+{#                  {% elif faculty.membership == 'b' %}#}
+{#                     Bronze#}
+{#                  {% endif %}#}
+{#                  </span>#}
+{#               </p>#}
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center">
+               <img src="/media/{{ faculty.photo }}" alt="Profile Picture" class="rounded-circle" style="height: 10rem; width: 10rem">
+            </div>
          </div>
       </div>
-   </div>
-   <div class="d-flex flex-column align-items-center">
-      <div class="my-3">
-         <img src="/media/{{faculty.photo}}" class="rounded-circle" alt="image" style="height: 10rem ; width:10rem">
+      <div class="card-footer d-flex justify-content-center">
+         <a href="{% url 'changePasswordPrompt'  %}" class="btn btn-primary mx-2">Change Password</a>
+         <a href="{% url 'changePhotoPrompt'  %}" class="btn btn-primary mx-2">Change Profile Picture</a>
       </div>
-      <div class="my-3">
-         <h5>Name : {{faculty.name}}</h5>
-         <h5>ID : <span class="mx-3 px-1"></span>{{faculty.faculty_id}}</h5>
-         <h5>Dept :<span class="mx-2"></span>{{faculty.department}}</h5>
-      </div>
-   </div>
-   <div class="d-flex justify-content-center">
-      <a href="{% url 'changePasswordPrompt'%}" class="btn btn-sm btn-primary border my-2 mx-1">
-      Change Password
-      </a>
-      <a href="{% url 'changePhotoPrompt'%}" class="btn btn-sm btn-primary border my-2 mx-1">
-      Change Profile Picture
-      </a>
    </div>
 </div>
+<!-- End Profile Info Card -->
+
 <script>
    setTimeout(function() {
       $('.alert').alert('close');
