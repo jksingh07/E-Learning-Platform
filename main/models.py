@@ -2,17 +2,29 @@ from django.db import models
 from froala_editor.fields import FroalaField
 
 # Create your models here.
-
-class CourseQuerySet(models.QuerySet):
-    def filter_by_membership(self, membership):
-        return self.filter(membership_level=membership)
-
-class CourseManager(models.Manager):
-    def get_queryset(self):
-        return CourseQuerySet(self.model, using=self._db)
-
-    def filter_by_membership(self, membership):
-        return self.get_queryset().filter_by_membership(membership)
+#
+# class CourseQuerySet(models.QuerySet):
+#     def filter_by_membership(self, membership):
+#         # Assuming membership is one of 'g', 's', or 'b'
+#         if membership == 'g':
+#             # For Gold membership, return all courses
+#             return self.all()
+#         elif membership == 's':
+#             # For Silver membership, return courses with 's' and 'b' membership levels
+#             return self.filter(membership_level__in=['s', 'b'])
+#         elif membership == 'b':
+#             # For Bronze membership, return courses with 'b' membership level
+#             return self.filter(membership_level='b')
+#         else:
+#             # For unknown membership, return an empty queryset
+#             return self.none()
+#
+# class CourseManager(models.Manager):
+#     def get_queryset(self):
+#         return CourseQuerySet(self.model, using=self._db)
+#
+#     def filter_by_membership(self, membership):
+#         return self.get_queryset().filter_by_membership(membership)
 
 class User(models.Model):
     STUDENT = 'ST'
@@ -47,6 +59,7 @@ class Student(models.Model):
         default="Student", max_length=100, null=False, blank=True)
     course = models.ManyToManyField(
         'Course', related_name='students', blank=True)
+    # course = models.ManyToManyField('Course')
     # student = Student.objects.get(student_id=1)
     # membership_c = student.membership
     # course = models.ManyToManyField('Course', related_name='students', blank=True,
@@ -61,11 +74,11 @@ class Student(models.Model):
             self.photo.delete()
         super().delete(*args, **kwargs)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.course.set(Course.objects.filter_by_membership(self.membership))
-        # course = models.ManyToManyField('Course', related_name='students', blank=True,
-        #                                 limit_choices_to={'membership_level': self.membership})
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     self.course.set(Course.objects.filter_by_membership(self.membership))
+    #     # course = models.ManyToManyField('Course', related_name='students', blank=True,
+    #     #                                 limit_choices_to={'membership_level': self.membership})
 
     class Meta:
         verbose_name_plural = 'Students'
@@ -142,7 +155,7 @@ class Course(models.Model):
     # payment_status = models.BooleanField(default=False)
     # payment_timestamp = models.DateTimeField(null=True)
 
-    objects = CourseManager()
+    # objects = CourseManager()
 
     class Meta:
         unique_together = ('code', 'department', 'name')

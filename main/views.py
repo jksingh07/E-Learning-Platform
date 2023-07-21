@@ -556,7 +556,6 @@ def courses(request):
     else:
         return redirect('std_login')
 
-
 def departments(request):
     if request.session.get('student_id') or request.session.get('faculty_id'):
         departments = Department.objects.all()
@@ -588,8 +587,11 @@ def access(request, code):
         student = Student.objects.get(student_id=request.session['student_id'])
         if request.method == 'POST':
             if (request.POST['key']) == str(course.studentKey):
+                print("correct key")
+                print(course)
                 student.course.add(course)
                 student.save()
+                print(student.course.all())
                 return redirect('/my/')
             else:
                 messages.error(request, 'Invalid key')
