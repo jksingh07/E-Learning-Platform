@@ -1,16 +1,16 @@
 {% extends 'index.html' %}
-{% block title %}Dashboard | eLMS {% endblock title %}
+{% block title %}Dashboard | eLearn-X {% endblock title %}
 {% block profile %}
-{% url 'profile' student.student_id %}
+    {% url 'profile' student.student_id %}
 {% endblock %}
 {% block user %}
-{{student.name}}
+    {{ student.name }}
 {% endblock user %}
 {% block allCourses %}
-{% url 'courses' %}
-{% endblock%}
+    {% url 'courses' %}
+{% endblock %}
 {% block courses %}
-{% url 'myCourses' %}
+    {% url 'myCourses' %}
 {% endblock %}
 {% block content %}
 <div>
@@ -25,29 +25,55 @@
       </div>
       {% if courses %}
       <!-- Course container -->
-      <div class="card_primary d-flex justify-content-center flex-wrap">
-         {% for courses in courses %}
+      <div class="list-group shadow p-3">
+         {% for course in courses %}
          <!-- individual course starts -->
-         <div class="cd card text-center my-4 mx-4" style="width: 30rem !important;">
-            <div class="card-header text-light fw-bold">
-               Dept. of {{courses.department}}
+         {% if course.membership_level == 'g' %}
+            <div class="card mb-3">
+               <div class="card-header bg-warning text-white">
+                  Dept. of {{ course.department }}
+               </div>
+               <div class="card-body">
+                  <h5 class="card-title">{{ course.department }}-{{ course.code }} : {{ course.name }}</h5>
+                  <p class="card-text">{% if course.faculty %}Course Teacher: {{ course.faculty.name }}{% else %}Teacher not assigned yet{% endif %}</p>
+               </div>
+               <div class="card-footer bg-warning text-white">
+                  <a href="{% url 'course' course.code %}" class="btn btn-outline-light">Enter</a>
+               </div>
             </div>
-            <div class="card-body">
-               <h5 class="card-title fw-bold"> {{courses.department}}-{{courses.code}} : {{courses.name}}</h5>
-               <a href="{% url 'course' courses.code %}" class="btn btn-outline-dark px-5">Enter</a>
+         {% elif course.membership_level == 's' %}
+            <div class="card mb-3">
+               <div class="card-header bg-secondary text-white">
+                  Dept. of {{ course.department }}
+               </div>
+               <div class="card-body">
+                  <h5 class="card-title">{{ course.department }}-{{ course.code }} : {{ course.name }}</h5>
+                  <p class="card-text">{% if course.faculty %}Course Teacher: {{ course.faculty.name }}{% else %}Teacher not assigned yet{% endif %}</p>
+               </div>
+               <div class="card-footer bg-secondary text-white">
+                  <a href="{% url 'course' course.code %}" class="btn btn-outline-dark btn-primary">Enter</a>
+               </div>
             </div>
-            <div class="card-footer text-light fw-bold">
-               {% if courses.faculty %}
-               Course Teacher : {{ courses.faculty.name}}
-               {% else %}
-               Teacher not assigned yet
-               {% endif %}
+         {% else %}
+            <div class="card mb-3">
+               <div class="card-header bg-dark text-white">
+                  Dept. of {{ course.department }}
+               </div>
+               <div class="card-body">
+                  <h5 class="card-title">{{ course.department }}-{{ course.code }} : {{ course.name }}</h5>
+                  <p class="card-text">{% if course.faculty %}Course Teacher: {{ course.faculty.name }}{% else %}Teacher not assigned yet{% endif %}</p>
+               </div>
+               <div class="card-footer bg-dark text-white">
+                  <a href="{% url 'course' course.code %}" class="btn btn-outline-dark btn-primary">Enter</a>
+               </div>
             </div>
-         </div>
+         {% endif %}
+         <!-- Add a horizontal line between cards -->
+         <hr class="my-4">
          <!-- individual course ends -->
          {% endfor %}
-         <!-- Course container ends -->
       </div>
+      <!-- Course container ends -->
       {% else %}
       <div class="text-center fs-5 text-secondary">
          <p>You are not enrolled in any courses</p>

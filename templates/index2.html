@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -17,39 +18,13 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
       {{ form.media }}
-
-      <style>
-         /* Modify the UI styles here */
-         body {
-            background-color: #f1f1f1;
-            color: #333;
-         }
-
-         .navbar-mod {
-            background-color: #337ab7;
-         }
-
-         .navbar-brand {
-            color: #fff;
-         }
-
-         .navbar-nav .nav-link {
-            color: #fff;
-         }
-
-         .navbar-nav .nav-link:hover {
-            color: #e0e0e0;
-         }
-
-         /* Add more custom styles as needed */
-      </style>
    </head>
    <body>
       <!-- Navbar Starts -->
       <nav class="navbar sticky-top navbar-expand-lg navbar-dark navbar-mod">
          <div class="container-fluid">
             <a class="navbar-brand fw-bold fs-5 px-2 py-1" href="/admin" target="_blank" data-bs-toggle="tooltip"
-               data-bs-placement="bottom" title="Access admin panel">elearn-X</a>
+               data-bs-placement="bottom" title="Access admin panel">eLearn-X</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
                aria-controls="navbarColor01" aria-expanded="true" aria-label="Toggle navigation">
             <span class=" navbar-toggler-icon"></span>
@@ -83,7 +58,7 @@
                         title="Check your profile">{% block user %}{% endblock  %}</a>
                   </li>
                </ul>
-               <form class="d-flex" action="{% url 'search' %}" method="GET">
+               <form class="d-flex" action=" {% url 'search' %}" method="GET">
                   <input id="searchIn" class="form-control me-2 searchbar" type="search" placeholder="Search courses" aria-label="Search"
                      name="q">
                   <button id="searchBtn" class="btn btn-outline-light" type="submit">Search</button>
@@ -94,6 +69,6 @@
       <!-- Navbar Ends -->
       {% block  content %}
       {% endblock  %}
-      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+      <script src=" {% static 'js/bootstrap.bundle.min.js' %} "></script>
    </body>
 </html>
