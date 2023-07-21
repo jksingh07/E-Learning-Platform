@@ -587,16 +587,41 @@ def access(request, code):
         student = Student.objects.get(student_id=request.session['student_id'])
         if request.method == 'POST':
             if (request.POST['key']) == str(course.studentKey):
-                print("correct key")
-                print(course)
+                # print("correct key")
+                # print(course)
                 student.course.add(course)
                 student.save()
-                print(student.course.all())
+
+                # print(student.course.all())
                 return redirect('/my/')
             else:
                 messages.error(request, 'Invalid key')
                 return HttpResponseRedirect(request.path_info)
         else:
+            # Send an email to the user with the access code
+            access_code = course.studentKey
+            subject = 'Access Code for Course'
+            template_name = 'main/access_code_email.html'
+            current_site = get_current_site(request)
+
+            # Render the email content using the template
+            email_content = render_to_string(template_name, {
+                'access_code': access_code,
+                'domain': current_site.domain,
+                'user': student,
+                'course': course,
+            })
+
+            # Create an EmailMessage object
+            email = EmailMessage(
+                subject=subject,
+                body=email_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[student.email],  # Replace with the actual recipient's email address
+            )
+
+            # Send the email
+            email.send()
             return render(request, 'main/access.html', {'course': course, 'student': student})
 
     else:

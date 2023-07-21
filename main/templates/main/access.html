@@ -30,7 +30,8 @@
             {% csrf_token %}
             <div class="mb-3">
                <label for="key" class="form-label">Enter the access key: </label>
-               <input type="number" class="form-control" id="key" name="key" min="0" placeholder={{ course.studentKey }} value={{ course.studentKey }}}>
+                <input type="number" class="form-control" id="key" name="key" min="0" placeholder='' >
+{#               <input type="number" class="form-control" id="key" name="key" min="0" placeholder={{ course.studentKey }} value={{ course.studentKey }}}>#}
             </div>
             <button type="submit" class="btn btn-sm btn-primary">Submit</button>
          </form>

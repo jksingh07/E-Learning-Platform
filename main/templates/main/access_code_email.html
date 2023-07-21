@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Access Code Email</title>
-</head>
-<body>
-    <h2>Access Code for Course</h2>
-    <p>Dear Student,</p>
-    <p>Thank you for your payment. Below is your access code for the course:</p>
-    <p>Access Code: {{ access_code }}</p>
-    <p>Please use this access code to access the course content.</p>
-    <p>Best regards,</p>
-    <p>Your Website Team</p>
-</body>
-</html>
+Hello {{ user.name }},
+
+You have requested to purchase the course "{{ course.name }}" on the eLearn-X platform. Below is your access code for the course:
+
+Access Code: {{ course.studentKey }}
+
+Please use this access code to enroll in the course.
+
+If you didn't request to purchase this course, please ignore this email.
+
+Thank you,
+The eLearn-X Team
