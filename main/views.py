@@ -959,6 +959,29 @@ def membership_payment(request, selected_membership_pk):
     }
     return render(request, 'main/membership_payment.html', context)
 
+def send_membership_email(request, user, selected_membership):
+    current_site = get_current_site(request)
+    subject = 'Membership Purchase Confirmation'
+    protocol = settings.SITE_PROTOCOL
+
+    # Render the email content using the template
+    email_content = render_to_string('main/membership_confirmation_email.html', {
+        'user': user,
+        'membership': selected_membership,
+        'protocol': protocol,
+        'domain': current_site.domain,
+    })
+
+    # Create an EmailMessage object
+    email = EmailMessage(
+        subject=subject,
+        body=email_content,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[user.email],  # Replace with the actual recipient's email address
+    )
+
+    # Send the email
+    email.send()
 def access_courses(request, code):
     selected_membership = Membership.objects.get(pk=code)
     std_id = request.session.get('student_id')
@@ -972,6 +995,8 @@ def access_courses(request, code):
         student.membership = 'b'
     student.save()
 
+    # Send the membership purchase email to the user
+    send_membership_email(request, student, selected_membership)
     return redirect('courses')
 
 def signup(request):
