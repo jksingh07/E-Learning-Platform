@@ -1114,9 +1114,9 @@ def password_reset_confirm(request, uidb64, token):
                     request, 'Password is incorrect. Please try again')
                 return redirect('/changePassword/')
         else:
-            return render(request, 'main/password_reset_confirm.html', {'user': user})
+            return render(request, 'main/password_reset_confirm.html', {'user': user, 'password': True})
 
-    return render(request, 'main/password_reset_confirm.html', {'form': form, 'user': user, 'token': token})
+    return render(request, 'main/password_reset_confirm.html', {'form': form, 'user': user, 'token': token, 'password': True})
 
 def password_reset_view(request):
     if request.method == 'POST':
