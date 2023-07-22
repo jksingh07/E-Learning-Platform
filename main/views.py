@@ -25,7 +25,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.urls import reverse
 from django.contrib.auth.forms import SetPasswordForm
 from django.utils.http import urlsafe_base64_decode
-
+from django.views import View
 # from django.utils.encoding import force_bytes
 
 class MyTokenGenerator(PasswordResetTokenGenerator):
@@ -115,7 +115,27 @@ def myCourses(request):
     except:
         return render(request, 'error.html')
 
+class MyCoursesView(View):
+    template_name = 'main/myCourses.html'
 
+    def get(self, request, *args, **kwargs):
+        try:
+            if request.session.get('student_id'):
+                student = Student.objects.get(student_id=request.session['student_id'])
+                courses = student.course.all()
+                faculty = student.course.all().values_list('faculty_id', flat=True)
+
+                context = {
+                    'courses': courses,
+                    'student': student,
+                    'faculty': faculty
+                }
+
+                return render(request, self.template_name, context)
+            else:
+                return redirect('std_login')
+        except:
+            return render(request, 'error.html')
 # Display all courses (faculty view)
 def facultyCourses(request):
     try:
@@ -1059,6 +1079,26 @@ def add_course(request):
     else:
         form = CourseForm()
     return render(request, 'main/add_course.html', {'form': form, 'faculty': faculty})
+
+class AddCourseView(View):
+    template_name = 'main/add_course.html'
+
+    def get(self, request, *args, **kwargs):
+        f_id = request.session.get('faculty_id')
+        faculty = Faculty.objects.get(faculty_id=f_id)
+        form = CourseForm()
+        return render(request, self.template_name, {'form': form, 'faculty': faculty})
+
+    def post(self, request, *args, **kwargs):
+        f_id = request.session.get('faculty_id')
+        faculty = Faculty.objects.get(faculty_id=f_id)
+        form = CourseForm(request.POST)
+        if form.is_valid():
+            course = form.save(commit=False)
+            course.faculty = faculty
+            course.save()
+            return redirect('courses')
+        return render(request, self.template_name, {'form': form, 'faculty': faculty})
 
 def forgot_password(request):
     form = ForgotPasswordForm(request.POST or None)

@@ -30,10 +30,10 @@
 <!-- navigation links end -->
 <div class="container">
    <div class="row justify-content-center">
-      <div class="col-sm-12 col-lg-8 shadow-lg rounded p-4">
-         <div class="text-center">
-            <div class="fw-bold text-start mb-3">Create Assignment</div>
-            <div class="form-group">
+      <div class="col-sm-12 col-lg-8">
+         <div class="card shadow">
+            <div class="card-body">
+               <h5 class="card-title fw-bold text-center mb-4">Create Assignment</h5>
                <form action="" method="POST" enctype="multipart/form-data">
                   {% csrf_token %}
                   {% for field in form %}
@@ -43,10 +43,10 @@
                      <span style="color:red">{{ field.errors }}</span>
                   </div>
                   {% endfor %}
-                  <p class="fw-bold" id="fileError"></p>
+                  <p class="fw-bold text-danger" id="fileError"></p>
                   <!-- submit button -->
-                  <div class="d-grid col-12 mx-auto">
-                     <button class="btn btn-primary my-2" type="submit">Post</button>
+                  <div class="text-center">
+                     <button class="btn btn-primary btn-lg mt-3 px-5" type="submit">Post</button>
                   </div>
                </form>
             </div>
@@ -54,6 +54,26 @@
       </div>
    </div>
 </div>
+<style>
+   /* Custom CSS for color scheme */
+   body {
+      background-color: #f8f9fa;
+   }
+
+   .card {
+      border-radius: 15px;
+      border: none;
+   }
+
+   .btn-primary {
+      background-color: #007bff;
+      border: none;
+   }
+
+   .btn-primary:hover {
+      background-color: #0056b3;
+   }
+</style>
 <script>
    let fileError = document.getElementById('fileError');
    // File format & size validation
@@ -63,17 +83,14 @@
       var validTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!validTypes.includes(fileType)) {
          fileError.innerHTML = "Only pdf, png, jpg, jpeg, gif and word files are allowed";
-         fileError.classList.add("text-danger", "fw-bold", "border", "border-danger", "p-2", "rounded");
          this.value = '';
       }
       else if (file.size > 10000000) {
          fileError.innerHTML = "File size should be less than 10MB";
-         fileError.classList.add("text-danger", "fw-bold", "border", "border-danger", "p-2", "rounded");
          this.value = '';
       }
       else {
          fileError.innerHTML = "";
-         fileError.classList.remove("text-danger", "fw-bold", "border", "border-danger", "p-2", "rounded");
       }
    });
 </script>

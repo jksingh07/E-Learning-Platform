@@ -1,10 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from .views import AddCourseView, MyCoursesView
 
 urlpatterns = [
     path('', views.std_login, name='std_login'),
-    path('my/', views.myCourses, name='myCourses'),
+    # path('my/', views.myCourses, name='myCourses'),
+    path('my/', MyCoursesView.as_view(), name='myCourses'),
     path('facultyCourses/', views.facultyCourses, name='facultyCourses'),
     path('login/', views.std_login, name='std_login'),
     path('logout/', views.std_logout, name='std_logout'),
@@ -55,7 +57,8 @@ urlpatterns = [
     path('membership_payment/<int:selected_membership_pk>/', views.membership_payment, name='membership_payment'),
     path('access_courses/<int:code>/', views.access_courses, name='access_courses'),
     path('signup/', views.signup, name='signup'),  # Signup page URL
-    path('add_course/', views.add_course, name='add_course'),
+    # path('add_course/', views.add_course, name='add_course'),
+    path('add_course/', AddCourseView.as_view(), name='add_course'),
     path('forgot_password/', views.forgot_password, name='forgot_password'),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='main/password_reset_form.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='main/password_reset_done.html'), name='password_reset_done'),
