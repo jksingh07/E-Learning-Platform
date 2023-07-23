@@ -1,13 +1,15 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import AddCourseView, MyCoursesView
+from .views import AddCourseView, MyCoursesView, LoginView
 
 urlpatterns = [
     path('', views.std_login, name='std_login'),
+    # path('', views.LoginView.as_view(), name='std_login'),
     # path('my/', views.myCourses, name='myCourses'),
     path('my/', MyCoursesView.as_view(), name='myCourses'),
     path('facultyCourses/', views.facultyCourses, name='facultyCourses'),
+    # path('login/', LoginView.as_view(), name='std_login'),
     path('login/', views.std_login, name='std_login'),
     path('logout/', views.std_logout, name='std_logout'),
     path('my/<int:code>/', views.course_page, name='course'),

@@ -1,5 +1,5 @@
 import datetime
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.contrib import messages
 from .models import Student, Course, Announcement, Assignment, Submission, Material, Faculty, Department, Payment, Membership
 from django.template.defaulttags import register
@@ -53,6 +53,48 @@ def is_faculty_authorised(request, code):
     else:
         return False
 
+class LoginView(View):
+    template_name = 'login_page.html'
+    error_messages = []
+
+    def get(self, request):
+        form = LoginForm()
+
+        if 'user_type' in request.COOKIES:
+            user_type = request.COOKIES['user_type']
+            if user_type == 'student':
+                return redirect('myCourses')
+            elif user_type == 'faculty':
+                return redirect('facultyCourses')
+
+        context = {'form': form, 'error_messages': self.error_messages}
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            id = form.cleaned_data['id']
+            password = form.cleaned_data['password']
+
+            if Student.objects.filter(student_id=id, password=password).exists():
+                response = redirect('myCourses')
+                response.set_cookie('user_type', 'student')
+                response.set_cookie('user_id', id)
+                return response
+            elif Faculty.objects.filter(faculty_id=id, password=password).exists():
+                response = redirect('facultyCourses')
+                response.set_cookie('user_type', 'faculty')
+                response.set_cookie('user_id', id)
+                return response
+            else:
+                self.error_messages.append('Invalid login credentials.')
+        else:
+            self.error_messages.append('Invalid form data.')
+
+        form = LoginForm()  # Reset the form after an unsuccessful login
+        context = {'form': form, 'error_messages': self.error_messages}
+        return render(request, self.template_name, context)
 
 # Custom Login page for both student and faculty
 def std_login(request):
@@ -67,10 +109,18 @@ def std_login(request):
 
             if Student.objects.filter(student_id=id, password=password).exists():
                 request.session['student_id'] = id
-                return redirect('myCourses')
+                response = redirect('myCourses')
+                response.set_cookie('user_type', 'student')
+                response.set_cookie('user_id', id)
+                return response
+                # return redirect('myCourses')
             elif Faculty.objects.filter(faculty_id=id, password=password).exists():
                 request.session['faculty_id'] = id
-                return redirect('facultyCourses')
+                response = redirect('facultyCourses')
+                response.set_cookie('user_type', 'faculty')
+                response.set_cookie('user_id', id)
+                return response
+                # return redirect('facultyCourses')
             else:
                 error_messages.append('Invalid login credentials.')
         else:
@@ -82,6 +132,13 @@ def std_login(request):
         return redirect('/my/')
     elif 'faculty_id' in request.session:
         return redirect('/facultyCourses/')
+
+    # if 'user_type' in request.COOKIES:
+    #     user_type = request.COOKIES['user_type']
+    #     if user_type == 'student':
+    #         return redirect('/my/')
+    #     elif user_type == 'faculty':
+    #         return redirect('/facultyCourses/')
 
     context = {'form': form, 'error_messages': error_messages}
     return render(request, 'login_page.html', context)
