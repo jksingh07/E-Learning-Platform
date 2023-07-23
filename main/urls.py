@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
-from .views import AddCourseView, MyCoursesView, LoginView
+from .views import AddCourseView, MyCoursesView, LoginView, MembershipPaymentView
 
 urlpatterns = [
     path('', views.std_login, name='std_login'),
@@ -57,6 +57,7 @@ urlpatterns = [
     path('payment/<int:course_code>/', views.payment, name='payment'),
     path('membership/', views.membership, name='membership'),
     path('membership_payment/<int:selected_membership_pk>/', views.membership_payment, name='membership_payment'),
+    path('membership_payment/<int:selected_membership_pk>/', MembershipPaymentView.as_view(), name='membership_payment'),
     path('access_courses/<int:code>/', views.access_courses, name='access_courses'),
     path('signup/', views.signup, name='signup'),  # Signup page URL
     # path('add_course/', views.add_course, name='add_course'),

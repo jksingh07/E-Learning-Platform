@@ -1,14 +1,23 @@
 {% extends 'index.html' %}
+
+{% block title %}Membership Payment | eLMS{% endblock title %}
+
 {% block profile %}
-{% if faculty  %} {% url 'profile' faculty.faculty_id %}
-{% else %} {% url 'profile' student.student_id %}
+{% if faculty %}
+    {% url 'profile' faculty.faculty_id %}
+{% else %}
+    {% url 'profile' student.student_id %}
 {% endif %}
-{% endblock %}
+{% endblock profile %}
+
 {% block user %}
-{% if faculty %} {{faculty.name}}
-{% else %} {{student.name}}
+{% if faculty %}
+    {{ faculty.name }}
+{% else %}
+    {{ student.name }}
 {% endif %}
 {% endblock user %}
+
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
@@ -25,8 +34,21 @@
                             <input type="text" class="form-control" id="membership" value="{{ selected_membership.name }}" readonly>
                         </div>
                         <div class="form-group">
-                            <label for="price">Price:</label>
-                            <input type="text" class="form-control" id="price" name="amount" value="{{ selected_membership.price }}" readonly>
+                            <label for="currency">Select Currency:</label>
+                            <select class="form-control" id="currency" name="currency">
+                                <option value="usd">USD</option>
+                                <option value="eur">EUR</option>
+                                <option value="cad">CAD</option>
+                                <option value="inr">INR</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Price in USD:</label>
+                            <input type="text" class="form-control" id="price" value="{{ selected_membership.price }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="converted-price">Price in Selected Currency:</label>
+                            <input type="text" class="form-control" id="converted-price" value="{{ selected_membership.price }}" readonly>
                         </div>
                         <div class="form-group">
                             <label for="features">Features:</label>
@@ -76,6 +98,30 @@
     var form = document.getElementById('payment-form');
     var paymentSuccessMessage = document.getElementById('payment-success');
 
+    function calculateAmount(currency, price) {
+        // Currency conversion logic based on the selected currency
+        // You need to implement this part using a currency conversion API or some other method.
+        // For the sake of this example, let's assume the conversion rate is fixed for USD, EUR, CAD, and INR.
+        if (currency === 'usd') {
+            return price;
+        } else if (currency === 'eur') {
+            return price * 0.85; // Assume 1 USD = 0.85 EUR
+        } else if (currency === 'cad') {
+            return price * 1.2; // Assume 1 USD = 1.2 CAD
+        } else if (currency === 'inr') {
+            return price * 75; // Assume 1 USD = 75 INR
+        } else {
+            return price;
+        }
+    }
+
+    document.getElementById('currency').addEventListener('change', function() {
+        var selectedCurrency = this.value;
+        var price = parseFloat("{{ selected_membership.price }}");
+        var convertedPrice = calculateAmount(selectedCurrency, price);
+        document.getElementById('converted-price').value = convertedPrice.toFixed(2);
+    });
+
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         stripe.createPaymentMethod('card', card).then(function(result) {
@@ -89,12 +135,121 @@
                         console.log(paymentResult.error.message);
                     } else {
                         paymentSuccessMessage.style.display = 'block';
-                        {#form.submit();#}
+                        // form.submit(); // Uncomment this if you want to submit the form after successful payment
                     }
                 });
             }
         });
     });
-
 </script>
 {% endblock %}
+
+
+
+{##}
+{##}
+{##}
+{##}
+{##}
+{##}
+{##}
+{#{% extends 'index.html' %}#}
+{#{% block profile %}#}
+{#{% if faculty  %} {% url 'profile' faculty.faculty_id %}#}
+{#{% else %} {% url 'profile' student.student_id %}#}
+{#{% endif %}#}
+{#{% endblock %}#}
+{#{% block user %}#}
+{#{% if faculty %} {{faculty.name}}#}
+{#{% else %} {{student.name}}#}
+{#{% endif %}#}
+{#{% endblock user %}#}
+{#{% block content %}#}
+{#<div class="container">#}
+{#    <div class="row justify-content-center">#}
+{#        <div class="col-md-6">#}
+{#            <div class="card">#}
+{#                <div class="card-header text-white">#}
+{#                    Membership Payment#}
+{#                </div>#}
+{#                <div class="card-body">#}
+{#                    <form method="POST" action="{% url 'membership_payment' selected_membership.pk %}" id="payment-form">#}
+{#                        {% csrf_token %}#}
+{#                        <div class="form-group">#}
+{#                            <label for="membership">Membership Type:</label>#}
+{#                            <input type="text" class="form-control" id="membership" value="{{ selected_membership.name }}" readonly>#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="price">Price:</label>#}
+{#                            <input type="text" class="form-control" id="price" name="amount" value="{{ selected_membership.price }}" readonly>#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="features">Features:</label>#}
+{#                            <textarea class="form-control" id="features" name="description" readonly>{{ selected_membership.features }}</textarea>#}
+{#                        </div>#}
+{#                        <div class="form-group">#}
+{#                            <label for="card-element">Card Details:</label>#}
+{#                            <div id="card-element" class="form-control"></div>#}
+{#                        </div>#}
+{#                        <br>#}
+{#                        <button id="pay-button" type="submit" class="btn btn-primary">Pay Now</button>#}
+{#                    </form>#}
+{#                    <div id="payment-success" class="alert alert-success mt-4" style="display: none;">#}
+{#                        <strong>Payment successful!</strong><br>#}
+{#                        <p>Congratulations {{ student.name }}!!! <br>Now you are a {{ selected_membership.name }} member</p>#}
+{#                        <div class="col">#}
+{#                            <a href="{% url 'access_courses' selected_membership.id %}" class="btn btn-outline-dark"><span class="px-2">Access</span></a>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+{##}
+{#<script src="https://js.stripe.com/v3/"></script>#}
+{#<script>#}
+{#    var stripe = Stripe('pk_test_51NTV2PL2VuWDvZdwEHpiXFWigyv751RPS1NV3AuQdb3MYxgBTZkmvNPj9Roa6y7PuO8xC5XY7Uh3L206ZmJvZibJ009Tlwwaij');#}
+{#    var elements = stripe.elements();#}
+{#    var style = {#}
+{#        base: {#}
+{#            color: '#32325d',#}
+{#            fontFamily: 'Arial, sans-serif',#}
+{#            fontSmoothing: 'antialiased',#}
+{#            fontSize: '16px',#}
+{#            '::placeholder': {#}
+{#                color: '#aab7c4'#}
+{#            }#}
+{#        },#}
+{#        invalid: {#}
+{#            color: '#fa755a',#}
+{#            iconColor: '#fa755a'#}
+{#        }#}
+{#    };#}
+{#    var card = elements.create('card', { style: style });#}
+{#    card.mount('#card-element');#}
+{#    var form = document.getElementById('payment-form');#}
+{#    var paymentSuccessMessage = document.getElementById('payment-success');#}
+{##}
+{#    form.addEventListener('submit', function(event) {#}
+{#        event.preventDefault();#}
+{#        stripe.createPaymentMethod('card', card).then(function(result) {#}
+{#            if (result.error) {#}
+{#                console.log(result.error.message);#}
+{#            } else {#}
+{#                stripe.handleCardPayment('{{ client_secret }}', {#}
+{#                    payment_method: result.paymentMethod.id#}
+{#                }).then(function(paymentResult) {#}
+{#                    if (paymentResult.error) {#}
+{#                        console.log(paymentResult.error.message);#}
+{#                    } else {#}
+{#                        paymentSuccessMessage.style.display = 'block';#}
+                        {#form.submit();#}
+{#                    }#}
+{#                });#}
+{#            }#}
+{#        });#}
+{#    });#}
+{##}
+{#</script>#}
+{#{% endblock %}#}

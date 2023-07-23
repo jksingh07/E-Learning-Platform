@@ -22,9 +22,9 @@ from main import views
 from froala_editor import views as froala_views
 
 
-admin.site.site_header = "eLMS Administration"
-admin.site.site_title = "eLMS Administration Portal"
-admin.site.index_title = "Welcome to eLMS Administration Portal"
+admin.site.site_header = "eLearn-X Administration"
+admin.site.site_title = "eLearn-X Administration Portal"
+admin.site.index_title = "Welcome to eLearn-X Administration Portal"
 
 
 urlpatterns = [

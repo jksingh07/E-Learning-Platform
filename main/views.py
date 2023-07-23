@@ -27,7 +27,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.utils.http import urlsafe_base64_decode
 from django.views import View
 # from django.utils.encoding import force_bytes
-
+import requests
 class MyTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
         return f"{user.pk}{timestamp}"
@@ -866,6 +866,20 @@ def guestFaculty(request):
     except:
         return redirect('std_login')
 
+def convert_currency(amount, base_currency, target_currency):
+    if base_currency == target_currency:
+        return amount
+
+    # Replace the API_URL with the actual API endpoint that provides exchange rates
+    API_URL = 'https://api.exchangerate-api.com/v4/latest/{}'.format(base_currency)
+    response = requests.get(API_URL)
+    data = response.json()
+    exchange_rate = data['rates'].get(target_currency)
+
+    if not exchange_rate:
+        raise ValueError("Invalid target currency")
+
+    return amount * exchange_rate
 
 def payment(request, course_code):
     print(course_code)
@@ -887,10 +901,12 @@ def payment(request, course_code):
 
         stripe.api_key = settings.STRIPE_SECRET_KEY
         stripe_pk = settings.STRIPE_PUBLIC_KEY
+        selected_currency = request.POST.get('currency', 'usd')
+        converted_amount = convert_currency(amount, 'usd', selected_currency)
         try:
             intent = stripe.PaymentIntent.create(
-                amount=int(amount*100),
-                currency='usd',
+                amount=int(converted_amount*100),
+                currency=selected_currency,
             )
             payment = Payment.objects.create(course=course, amount=amount, description=description)
             payment.save()
@@ -990,42 +1006,6 @@ def membership_payment(request, selected_membership_pk):
         )
         client_secret = intent.client_secret
 
-    # elif request.method == 'POST':
-    #     # Get the payment details from the form
-    #     stripe.api_key = settings.STRIPE_SECRET_KEY
-    #
-    #     # Assume you have received the payment details from the form
-    #     # and have the necessary payment processing code here.
-    #     # For example, if you have received a successful payment, set payment_success to True
-    #
-    #     # Sample code for payment processing using Stripe
-    #     try:
-    #         # Replace the following line with your actual payment processing code
-    #         # For example, if payment is successful, set payment_success to True
-    #         # payment_success = True
-    #
-    #         # Since this is just a sample, we'll simulate a successful payment here
-    #         payment_success = True
-    #
-    #     except stripe.error.CardError as e:
-    #         error_message = e.error.message
-    #         return render(request, 'main/payment_error.html', {'error_message': error_message})
-    #     except Exception as e:
-    #         error_message = str(e)
-    #         return render(request, 'main/payment_error.html', {'error_message': error_message})
-    #
-    #     if payment_success:
-    #         # Update the student's membership
-    #         if selected_membership.name == 'Gold':
-    #             student.membership = 'g'
-    #         elif selected_membership.name == 'Silver':
-    #             student.membership = 's'
-    #         else:
-    #             student.membership = 'b'
-    #         student.save()
-    #
-    #         # Redirect to a success page after successful payment
-    #         return redirect('membership_payment_success')
 
     context = {
         'selected_membership': selected_membership,
@@ -1035,6 +1015,73 @@ def membership_payment(request, selected_membership_pk):
         'payment_success': payment_success,  # Pass the payment_success flag to the template
     }
     return render(request, 'main/membership_payment.html', context)
+
+
+class MembershipPaymentView(View):
+    def get(self, request, selected_membership_pk):
+        selected_membership = Membership.objects.get(pk=selected_membership_pk)
+        student = None
+        faculty = None
+        if request.session.get('student_id'):
+            student = Student.objects.get(student_id=request.session['student_id'])
+        if request.session.get('faculty_id'):
+            faculty = Faculty.objects.get(faculty_id=request.session['faculty_id'])
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        currencies = ['usd', 'eur', 'cad', 'inr']  # Add other supported currencies here
+
+        context = {
+            'selected_membership': selected_membership,
+            'student': student,
+            'faculty': faculty,
+            'currencies': currencies,
+            'prices': {
+                'usd': selected_membership.price,
+                'eur': selected_membership.price_in_eur,
+                # Assuming you have a price_in_eur field in the Membership model
+                'cad': selected_membership.price_in_cad,
+                # Assuming you have a price_in_cad field in the Membership model
+                'inr': selected_membership.price_in_inr,
+                # Assuming you have a price_in_inr field in the Membership model
+                # Add other supported currencies here with their respective prices
+            },
+        }
+        return render(request, 'main/membership_payment.html', context)
+
+    def post(self, request, selected_membership_pk):
+        print("POST REQUEST")
+        selected_membership = Membership.objects.get(pk=selected_membership_pk)
+        student = None
+        faculty = None
+        if request.session.get('student_id'):
+            student = Student.objects.get(student_id=request.session['student_id'])
+        if request.session.get('faculty_id'):
+            faculty = Faculty.objects.get(faculty_id=request.session['faculty_id'])
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        # Get the selected currency from the POST data
+        selected_currency = request.POST.get('currency', 'usd')
+        price = request.POST.get('converted-price')
+        print(price)
+        amount_in_cents = int(price * 100)
+        # amount_in_cents = int(selected_membership.price * 100)
+
+        # Create a PaymentIntent and get the client_secret for the payment form
+        intent = stripe.PaymentIntent.create(
+            amount=amount_in_cents,
+            currency=selected_currency,
+        )
+        client_secret = intent.client_secret
+
+        context = {
+            'selected_membership': selected_membership,
+            'student': student,
+            'faculty': faculty,
+            'client_secret': client_secret,
+            'selected_currency': selected_currency,
+        }
+        return render(request, 'main/membership_payment.html', context)
 
 def send_membership_email(request, user, selected_membership):
     current_site = get_current_site(request)
