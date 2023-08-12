@@ -1177,7 +1177,7 @@ def add_course(request):
             # Save the new course
             course = form.save(commit=False)
             # Assuming you have the faculty object available in the current session
-            # course.faculty = request.session.get('faculty', None)
+            course.faculty = request.session.get('faculty', None)
             course.save()
             return redirect('courses')
     else:
