@@ -48,6 +48,13 @@ To experience the power of eLearn-X, follow these steps:
 2. Install the necessary dependencies by running `npm install`.
 3. Start the server using `npm start`.
 
+## User Interface
+### Sign-Up
+![Sign Up](images/sign_up.png)
+<br>
+### Profile Page
+![Profile Page](images/profile.png)
+
 ## Conclusion
 
 eLearn-X redefines education by seamlessly fusing leading E-Learning features with the efficiency of LMS systems. With its comprehensive course interactions, secure payments, and automated workflows, eLearn-X empowers students and faculty alike. This project stands as a testament to my ability to transform concepts into impactful solutions.
