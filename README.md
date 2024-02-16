@@ -51,9 +51,67 @@ To experience the power of eLearn-X, follow these steps:
 ## User Interface
 ### Sign-Up
 ![Sign Up](images/sign_up.png)
-<br>
+
+
 ### Profile Page
 ![Profile Page](images/profile.png)
+
+
+### Membership Page
+![Membership](images/membership.png)
+
+
+### All Courses page
+![Courses](images/all_courses.png)
+
+
+
+### Payment Page
+![Payment Page](images/payment_page.png)
+
+
+
+### Student Dashboard
+![Dashboard](images/dashboard.png)
+
+
+
+### Course Dashboard
+![Course Dashboard](images/course_dashboard.png)
+
+
+
+### Forgot Password
+![Forgot Password](images/forgot_pwd.png)
+
+
+### Password Reset Email 
+![Reset PWD Email](images/Email_confirmation.png)
+
+
+### Quiz Start page
+![Quiz](images/quiz_start.png)
+
+### Quiz Questions page
+![Quiz Questions](images/quiz_ques.png)
+
+
+### Quiz Result page
+![Quiz Result](images/quiz.png)
+
+
+### Quiz Analysis page
+![Quiz Analysis](images/quiz_analysis.png)
+
+
+### Create Assignment page
+![Create Asgmt](images/create_assignment.png)
+
+
+### Assignment Submission page
+![Submit Asgmt](images/assignment_submission.png)
+
+
 
 ## Conclusion
 
